@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GPHIS - Smart Study</title>
+<style>
+  /* Reset and basic styles */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f9fafb;
+    margin: 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #22313f;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  body.dark-mode {
+    background: #121212;
+    color: #e0e0e0;
+  }
+  header {
+    text-align: center;
+    margin: 40px 0 20px;
+  }
+  h1 {
+    font-weight: 700;
+    color: #006ca2; /* GPHIS blue */
+    font-size: 2.8rem;
+    margin-bottom: 5px;
+  }
+  body.dark-mode h1 {
+    color: #58a6ff;
+  }
+  h2.subtitle {
+    font-weight: 500;
+    color: #004a71;
+    font-size: 1.3rem;
+    margin-top: 0;
+  }
+  body.dark-mode h2.subtitle {
+    color: #7fbfff;
+  }
+  main {
+    max-width: 520px;
+    background: white;
+    margin: 0 auto 40px;
+    padding: 25px 35px 35px;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 108, 162, 0.12);
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  main > div {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  body.dark-mode main {
+    background: #1e1e1e;
+    box-shadow: 0 6px 20px rgba(0, 108, 162, 0.8);
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #004a71;
+  }
+  body.dark-mode label {
+    color: #7fbfff;
+  }
+  input[type="text"], select, input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 22px;
+    border: 2px solid #b5c6d0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+  }
+  input[type="text"]:focus, select:focus, input[type="number"]:focus {
+    border-color: #006ca2;
+    outline: none;
+  }
+  body.dark-mode input[type="text"],
+  body.dark-mode select,
+  body.dark-mode input[type="number"] {
+    background-color: #2c2c2c;
+    border-color: #58a6ff;
+    color: #e0e0e0;
+  }
+  input[type="number"] {
+    max-width: 180px;
+  }
+  button {
+    background-color: #006ca2;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    font-weight: 700;
+    margin-right: 10px;
+  }
+  button:hover {
+    background-color: #004a71;
+  }
+  body.dark-mode button {
+    background-color: #58a6ff;
+    color: #121212;
+  }
+  body.dark-mode button:hover {
+    background-color: #2f74e0;
+  }
+  #timer-display {
+    font-size: 2.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #27ae60;
+    letter-spacing: 3px;
+  }
+  body.dark-mode #timer-display {
+    color: #7fffbf;
+  }
+  #challenge-status {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #d35400;
+  }
+  body.dark-mode #challenge-status {
+    color: #ffb347;
+  }
+  section#sessions {
+    margin-top: 35px;
+  }
+  section#sessions h2 {
+    border-bottom: 3px solid #006ca2;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    color: #006ca2;
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+  body.dark-mode section#sessions h2 {
+    border-color: #58a6ff;
+    color: #58a6ff;
+  }
+  ul.session-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    border-radius: 10px;
+    border: 1px solid #b5c6d0;
+    background: #f0f6fb;
+  }
+  body.dark-mode ul.session-list {
+    background: #2a2a2a;
+    border-color: #58a6ff;
+  }
+  ul.session-list li {
+    background: #d9e7f3;
+    margin: 12px 14px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    color: #22313f;
+    box-shadow: 0 2px 5px rgba(0, 108, 162, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  body.dark-mode ul.session-list li {
+    background: #333;
+    color: #e0e0e0;
+    box-shadow: none;
+  }
+  ul.session-list li button.delete-session-btn {
+    background-color: #d35400;
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    margin-left: 10px;
+  }
+  ul.session-list li button.delete-session-btn:hover {
+    background-color: #a03e00;
+  }
+  #total-time {
+    font-weight: 700;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1.3rem;
+    color: #004a71;
+  }
+  #total-sessions {
+    font-weight: 600;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #004a71;
+  }
+  body.dark-mode #total-time,
+  body.dark-mode #total-sessions {
+    color: #7fbfff;
+  }
+  #clear-sessions-btn {
+    display: block;
+    margin: 15px auto 0;
+    background-color: #d35400;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #clear-sessions-btn:hover {
+    background-color: #a03e00;
+  }
+  #filter-sort-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  #filter-sessions, #sort-sessions {
+    width: 48%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 2px solid #b5c6d0;
+    transition: border-color 0.3s;
+  }
+  #filter-sessions:focus, #sort-sessions:focus {
+    border-color: #006ca2;
+    outline: none;
+  }
+  body.dark-mode #filter-sessions, body.dark-mode #sort-sessions {
+    background-color: #2c2c2c;
+    border-color: #58a6ff;
+    color: #e0e0e0;
+  }
+  #reset-total-btn {
+    display: block;
+    margin: 12px auto 0;
+    background-color: #00704a;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    color: white;
+    border: none;
+  }
+  #reset-total-btn:hover {
+    background-color: #00532a;
+  }
+  footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 20px;
+  }
+  body.dark-mode footer {
+    color: #aaa;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img src="logo.png" alt="GPHIS logo"><br>Smart Study Habit Tracker</h1>
+  <h2 class="subtitle">Monitor and Improve Your Study Habits</h2>
+</header>
+
+<main>
+
+  <div>
+    <label for="subject-input">Subject / Topic:</label>
+    <input type="text" id="subject-input" placeholder="Enter subject or topic" />
+  </div>
+
+  <div>
+    <label for="challenge-select">Wanna Take a Challenge?</label>
+    <select id="challenge-select">
+      <option value="0" selected>No challenge</option>
+      <option value="900">15 minutes</option>
+      <option value="1800">30 minutes</option>
+      <option value="2700">45 minutes</option>
+      <option value="3600">60 minutes</option>
+      <option value="-1">Custom (minutes)</option>
+    </select>
+    <input type="number" id="custom-time-input" min="1" placeholder="Enter custom minutes" style="display:none;" />
+  </div>
+
+  <div style="text-align:center; width:100%;">
+    <div id="timer-display">00:00:00</div>
+    <div id="challenge-status"></div>
+  </div>
+
+  <div style="text-align:center; width:100%;">
+    <button id="start-stop-btn">Start Study Session</button>
+    <button id="pause-resume-btn" style="display:none;">Pause</button>
+    <button id="export-btn">Export CSV</button>
+    <button id="dark-mode-toggle">Dark Mode</button>
+  </div>
+
+  <!-- New: Search filter and sort dropdown -->
+  <div id="filter-sort-container">
+    <input type="text" id="filter-sessions" placeholder="Filter sessions by subject..." />
+    <select id="sort-sessions" title="Sort sessions">
+      <option value="time-desc" selected>Sort by Time Desc</option>
+      <option value="time-asc">Sort by Time Asc</option>
+      <option value="subject-asc">Sort by Subject A-Z</option>
+      <option value="subject-desc">Sort by Subject Z-A</option>
+    </select>
+  </div>
+
+  <section id="sessions">
+    <h2>Study Sessions</h2>
+    <ul class="session-list" id="session-list"></ul>
+    <div id="total-time">Total Study Time: 00:00:00</div>
+    <div id="total-sessions">Total Sessions: 0</div>
+    <button id="clear-sessions-btn">Clear All Sessions</button>
+    <!-- New: Reset total time without clearing sessions -->
+    <button id="reset-total-btn" title="Reset total study time counter">Reset Total Study Time</button>
+  </section>
+
+</main>
+
+<footer>
+  &copy; 2025 GPHIS Smart Study Habit Tracker
+</footer>
+
+<script>
+  // Variables
+  const subjectInput = document.getElementById('subject-input');
+  const challengeSelect = document.getElementById('challenge-select');
+  const customTimeInput = document.getElementById('custom-time-input');
+  const timerDisplay = document.getElementById('timer-display');
+  const challengeStatus = document.getElementById('challenge-status');
+  const startStopBtn = document.getElementById('start-stop-btn');
+  const pauseResumeBtn = document.getElementById('pause-resume-btn');
+  const sessionList = document.getElementById('session-list');
+  const exportBtn = document.getElementById('export-btn');
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+  const clearSessionsBtn = document.getElementById('clear-sessions-btn');
+  const totalTimeDisplay = document.getElementById('total-time');
+  const totalSessionsDisplay = document.getElementById('total-sessions');
+  const filterInput = document.getElementById('filter-sessions');
+  const sortSelect = document.getElementById('sort-sessions');
+  const resetTotalBtn = document.getElementById('reset-total-btn');
+
+  let timerInterval = null;
+  let elapsedSeconds = 0;
+  let challengeSeconds = 0;
+  let isRunning = false;
+  let isPaused = false;
+
+  // Study sessions storage and filtered/sorted display
+  let studySessions = [];
+  let filteredSessions = [];
+  let totalDurationCounter = 0; // For resettable total time feature
+
+  // Format seconds into HH:MM:SS
+  function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  // Update timer display each second
+  function updateTimer() {
+    if (!isPaused) {
+      elapsedSeconds++;
+      timerDisplay.textContent = formatTime(elapsedSeconds);
+
+      if (challengeSeconds > 0) {
+        const remaining = challengeSeconds - elapsedSeconds;
+        if (remaining > 0) {
+          challengeStatus.textContent = `Challenge: ${formatTime(remaining)} remaining`;
+        } else {
+          challengeStatus.textContent = 'Challenge Time Completed! Great job!';
+        }
+      } else {
+        challengeStatus.textContent = '';
+      }
+
+      checkAlarm();
+    }
+  }
+
+  // Alert user when challenge time ends
+  function checkAlarm() {
+    if (challengeSeconds > 0 && elapsedSeconds === challengeSeconds) {
+      alert('Challenge Time is up! Time to finish your study session.');
+    }
+  }
+
+  // Start / Stop button
+  startStopBtn.addEventListener('click', () => {
+    if (!isRunning) {
+      // Start
+      if (subjectInput.value.trim() === '') {
+        alert('Please enter a subject or topic before starting.');
+        return;
+      }
+      isRunning = true;
+      isPaused = false;
+      timerInterval = setInterval(updateTimer, 1000);
+      startStopBtn.textContent = 'Stop Study Session';
+      pauseResumeBtn.style.display = 'inline-block';
+      pauseResumeBtn.textContent = 'Pause';
+
+      // Setup challengeSeconds based on select
+      if (challengeSelect.value === '-1') {
+        const customMinutes = parseInt(customTimeInput.value, 10);
+        if (isNaN(customMinutes) || customMinutes <= 0) {
+          alert('Please enter a valid custom time in minutes.');
+          clearInterval(timerInterval);
+          isRunning = false;
+          pauseResumeBtn.style.display = 'none';
+          startStopBtn.textContent = 'Start Study Session';
+          return;
+        }
+        challengeSeconds = customMinutes * 60;
+      } else {
+        challengeSeconds = parseInt(challengeSelect.value, 10);
+      }
+      challengeStatus.textContent = '';
+    } else {
+      // Stop
+      if (elapsedSeconds === 0) {
+        alert('Please start and study some time before stopping.');
+        return;
+      }
+      clearInterval(timerInterval);
+      isRunning = false;
+      pauseResumeBtn.style.display = 'none';
+      startStopBtn.textContent = 'Start Study Session';
+      challengeStatus.textContent = '';
+
+      // Log session and reset timer
+      logSession();
+      elapsedSeconds = 0;
+      timerDisplay.textContent = '00:00:00';
+    }
+  });
+
+  // Pause / Resume button
+  pauseResumeBtn.addEventListener('click', () => {
+    if (!isPaused) {
+      isPaused = true;
+      pauseResumeBtn.textContent = 'Resume';
+    } else {
+      isPaused = false;
+      pauseResumeBtn.textContent = 'Pause';
+    }
+  });
+
+  // Show or hide custom time input for challenge timer
+  challengeSelect.addEventListener('change', () => {
+    if (challengeSelect.value === '-1') {
+      customTimeInput.style.display = 'block';
+    } else {
+      customTimeInput.style.display = 'none';
+      customTimeInput.value = '';
+    }
+  });
+
+  // Log a session and save
+  function logSession() {
+    const subject = subjectInput.value.trim();
+    if (!subject) return;
+    const session = {
+      subject,
+      duration: elapsedSeconds,
+      timestamp: new Date().toLocaleString(),
+    };
+    studySessions.push(session);
+
+    // Update total duration counter
+    totalDurationCounter += elapsedSeconds;
+
+    saveSessions();
+    applyFilterSortAndRender();
+
+    // Clear inputs
+    subjectInput.value = '';
+    challengeSelect.value = '0';
+    customTimeInput.value = '';
+    customTimeInput.style.display = 'none';
+  }
+
+  // Save sessions and totalDurationCounter to localStorage
+  function saveSessions() {
+    localStorage.setItem('studySessions', JSON.stringify(studySessions));
+    localStorage.setItem('totalDurationCounter', totalDurationCounter.toString());
+  }
+
+  // Load sessions and totalDurationCounter from localStorage
+  function loadSessions() {
+    const savedSessions = localStorage.getItem('studySessions');
+    if (savedSessions) {
+      studySessions = JSON.parse(savedSessions);
+    }
+    const savedTotal = localStorage.getItem('totalDurationCounter');
+    totalDurationCounter = savedTotal ? parseInt(savedTotal, 10) : 0;
+    applyFilterSortAndRender();
+  }
+
+  // Render the sessions after filter & sort applied
+  function renderSessions(sessions) {
+    sessionList.innerHTML = '';
+
+    sessions.forEach((session, index) => {
+      const li = document.createElement('li');
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = `${session.subject} — ${formatTime(session.duration)}`;
+
+      const btnGroup = document.createElement('span');
+
+      // Edit Button
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.style.marginRight = '8px';
+      editBtn.style.fontSize = '0.8rem';
+      editBtn.style.padding = '4px 8px';
+      editBtn.style.borderRadius = '6px';
+      editBtn.style.border = 'none';
+      editBtn.style.cursor = 'pointer';
+      editBtn.style.backgroundColor = '#f39c12';
+      editBtn.style.color = 'white';
+      editBtn.addEventListener('click', () => {
+        const newSubject = prompt('Edit subject/topic:', session.subject);
+        if (newSubject !== null && newSubject.trim() !== '') {
+          session.subject = newSubject.trim();
+        }
+        const newDurationStr = prompt('Edit duration (minutes):', Math.floor(session.duration / 60));
+        if (newDurationStr !== null) {
+          const newDuration = parseInt(newDurationStr, 10);
+          if (!isNaN(newDuration) && newDuration > 0) {
+            // Adjust totalDurationCounter accordingly
+            totalDurationCounter = totalDurationCounter - session.duration + (newDuration * 60);
+            session.duration = newDuration * 60;
+          } else {
+            alert('Invalid duration entered, keeping old value.');
+          }
+        }
+        saveSessions();
+        applyFilterSortAndRender();
+      });
+      btnGroup.appendChild(editBtn);
+
+      // Delete Button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.classList.add('delete-session-btn');
+      deleteBtn.style.fontSize = '0.8rem';
+      deleteBtn.style.padding = '4px 8px';
+      deleteBtn.style.borderRadius = '6px';
+      deleteBtn.style.border = 'none';
+      deleteBtn.style.cursor = 'pointer';
+      deleteBtn.style.backgroundColor = '#c0392b';
+      deleteBtn.style.color = 'white';
+      deleteBtn.addEventListener('click', () => {
+        if (confirm(`Delete session "${session.subject}"?`)) {
+          totalDurationCounter -= session.duration; // Adjust total duration
+          studySessions.splice(studySessions.indexOf(session), 1);
+          saveSessions();
+          applyFilterSortAndRender();
+        }
+      });
+      btnGroup.appendChild(deleteBtn);
+
+      li.appendChild(textSpan);
+      li.appendChild(btnGroup);
+      sessionList.appendChild(li);
+    });
+
+    totalTimeDisplay.textContent = `Total Study Time: ${formatTime(totalDurationCounter)}`;
+    totalSessionsDisplay.textContent = `Total Sessions: ${studySessions.length}`;
+  }
+
+  // Export CSV file
+  exportBtn.addEventListener('click', () => {
+    if (studySessions.length === 0) {
+      alert('No study sessions to export.');
+      return;
+    }
+    let csvContent = 'Subject,Duration,Timestamp\n';
+    studySessions.forEach(session => {
+      csvContent += `"${session.subject}",${formatTime(session.duration)},"${session.timestamp}"\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'study_sessions.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Dark mode toggle
+  darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+  });
+
+  // Clear all sessions
+  clearSessionsBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all study sessions?')) {
+      studySessions = [];
+      totalDurationCounter = 0;
+      saveSessions();
+      applyFilterSortAndRender();
+    }
+  });
+
+  // Reset total study time counter (new feature)
+  resetTotalBtn.addEventListener('click', () => {
+    if (confirm('Reset total study time counter? This will not delete sessions.')) {
+      totalDurationCounter = 0;
+      saveSessions();
+      applyFilterSortAndRender();
+    }
+  });
+
+  // Filter input event
+  filterInput.addEventListener('input', () => {
+    applyFilterSortAndRender();
+  });
+
+  // Sort dropdown change event
+  sortSelect.addEventListener('change', () => {
+    applyFilterSortAndRender();
+  });
+
+  // Apply filter, sort and then render
+  function applyFilterSortAndRender() {
+    const filterText = filterInput.value.toLowerCase();
+
+    filteredSessions = studySessions.filter(session => {
+      return session.subject.toLowerCase().includes(filterText);
+    });
+
+    const sortValue = sortSelect.value;
+    filteredSessions.sort((a, b) => {
+      switch (sortValue) {
+        case 'time-asc':
+          return a.duration - b.duration;
+        case 'time-desc':
+          return b.duration - a.duration;
+        case 'subject-asc':
+          return a.subject.localeCompare(b.subject);
+        case 'subject-desc':
+          return b.subject.localeCompare(a.subject);
+        default:
+          return 0;
+      }
+    });
+
+    renderSessions(filteredSessions);
+  }
+
+  // Load saved data on page load
+  window.addEventListener('load', () => {
+    loadSessions();
+  });
+</script>
+
+</body>
+</html>
